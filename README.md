@@ -1,8 +1,8 @@
-# SPY Next-Day Direction Prediction
+# A Research Project on how Machine Learning can be used with predicting financial market
 
-A comparison of machine learning and baseline trading strategies for predicting the next-day
-direction of the SPY ETF, built around a hand-rolled decision tree / random forest, a small
-PyTorch neural network, and two simple rule-based baselines. Strategies are backtested and
+In this project I was comparing machine learning and baseline trading strategies for predicting the next-day
+direction of the SPY ETF. I built a decision tree / random forest, a small
+PyTorch neural network and compared them two simple rule-based baselines. Strategies are backtested and
 ranked on total return, annualised return, annualised volatility, Sharpe ratio, and maximum
 drawdown.
 
@@ -24,7 +24,7 @@ drawdown.
 
 ## Methodology
 
-**Data.** Daily SPY OHLCV data is pulled via `yfinance` (~10 years of history). Adjusted close
+**Data.** Daily SPY data is pulled via `yfinance` (~10 years of history). Adjusted close
 prices are used so that dividend payouts don't distort returns.
 
 **Features** (`Features.ipynb`), computed from daily closes/volume:
@@ -41,21 +41,7 @@ Data is split chronologically to avoid lookahead bias:
 
 **Baseline strategies** (`BaselineStrategies.ipynb`):
 - *Buy and Hold* — always long.
-- *Momentum* — long if the prior day's 20-day return was positive, flat otherwise.
-
-**Decision tree / random forest** (`decisionTreeFunctions.py`, `DecisionTree.ipynb`) —
-implemented from scratch rather than with a library:
-- Candidate split thresholds are the 10th–90th percentiles of each feature.
-- Splits are chosen by Gini impurity reduction.
-- Several tree depths are grown and the depth that performs best on the validation set is
-  selected for the final test.
-- The random forest bags each tree on a random subset of the rows and a random pair of
-  feature columns, then predicts by majority vote across trees.
-
-**Neural network** (`NeuralNetwork.ipynb`) — a small PyTorch feed-forward classifier:
-- Architecture: `4 → 32 → 8 → 1` with ReLU activations.
-- Trained with `BCEWithLogitsLoss` and the Adam optimiser (lr `1e-3`) for 1000 epochs,
-  validated each epoch on the validation set.
+- *Momentum* — long if the prior day's 20-day return was positive.
 
 **Evaluation** (`metrics.py`, `Comparison.ipynb`) — each strategy's predictions are turned into
 daily strategy returns (position × market return) and scored on:
@@ -69,8 +55,8 @@ daily strategy returns (position × market return) and scored on:
 
 Across the test period, Buy and Hold produced the highest total and annualised return, but the
 other strategies reduced drawdown and volatility. The Neural Network and Momentum strategies
-achieved better risk-adjusted returns (Sharpe ratio) than Buy and Hold, while the Decision Tree
-and Random Forest underperformed — likely due to the limited feature set, a simple from-scratch
+achieved better risk adjusted returns (Sharpe ratio) than Buy and Hold, while the Decision Tree
+and Random Forest underperformed, likely due to the limited feature set, a simple from-scratch
 implementation, or the difficulty of predicting next-day direction from price/volume features
 alone. Full figures are produced by `Comparison.ipynb`.
 
@@ -79,9 +65,6 @@ alone. Full figures are produced by `Comparison.ipynb`.
 ```bash
 pip install numpy pandas yfinance matplotlib torch
 ```
-
-Python 3.13 was used during development; the notebooks should run on any recent Python 3
-environment with the packages above.
 
 ## Running the pipeline
 
@@ -93,10 +76,3 @@ Run the notebooks in this order — each stage writes CSVs consumed by the next:
    predictions to `Predictions/`
 4. `Comparison.ipynb` — loads every prediction file and produces the final comparison table
 
-## Notes
-
-- The notebooks currently read/write using hardcoded absolute paths
-  (`C:/Users/.../ml_project_cv/...`). Update these to match your local `Data/` and
-  `Predictions/` directories (or switch to relative paths) before running.
-- The decision tree and random forest are implemented from scratch for learning purposes
-  rather than using `scikit-learn`.
