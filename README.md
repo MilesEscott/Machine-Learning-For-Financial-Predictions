@@ -1,4 +1,4 @@
-# A Research Project on how Machine Learning can be used with predicting financial market
+# A Research Project on how Machine Learning can be Used with Predicting Financial Market
 
 In this project I was comparing machine learning and baseline trading strategies for predicting the next-day
 direction of the SPY ETF. I built a decision tree / random forest, a small
